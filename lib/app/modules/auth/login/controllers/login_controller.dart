@@ -4,23 +4,28 @@ import '../../../../data/repositories/auth_repo.dart';
 import '../../../../data/services/storage_service.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../core/utils/helpers.dart';
+import '../../../../core/utils/error_handler.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
-  final isLoading = false.obs;
-  final obscurePassword = true.obs;
+  bool isLoading = false;
+  bool obscurePassword = true;
 
   final _repo = AuthRepo();
 
-  void togglePasswordVisibility() => obscurePassword.toggle();
+  void togglePasswordVisibility() {
+    obscurePassword = !obscurePassword;
+    update();
+  }
 
   Future<void> login() async {
     if (!formKey.currentState!.validate()) return;
 
-    isLoading.value = true;
+    isLoading = true;
+    update();
     try {
       final response = await _repo.signIn(
         email: emailController.text.trim(),
@@ -29,7 +34,15 @@ class LoginController extends GetxController {
 
       final user = response.user;
       if (user == null) {
-        showSnackBar(message: 'Login failed. Please try again.', isError: true);
+        AppSnackBar.error('Login failed. Please try again.');
+        return;
+      }
+
+      if (user.emailConfirmedAt == null) {
+        AppSnackBar.warning(
+          'Please check your email and confirm your account before signing in.',
+        );
+        await _repo.signOut();
         return;
       }
 
@@ -42,12 +55,13 @@ class LoginController extends GetxController {
         case 'admin':
           Get.offAllNamed(Routes.ADMIN_DASHBOARD);
         default:
-          Get.offAllNamed(Routes.CUSTOMER_HOME);
+          Get.offAllNamed(Routes.CUSTOMER_SHELL);
       }
     } catch (e) {
-      showSnackBar(message: e.toString(), isError: true);
+      AppSnackBar.error(ErrorHandler.parse(e));
     } finally {
-      isLoading.value = false;
+      isLoading = false;
+      update();
     }
   }
 

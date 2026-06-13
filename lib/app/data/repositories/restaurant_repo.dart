@@ -39,4 +39,27 @@ class RestaurantRepo {
         .update({'is_open': isOpen})
         .eq('id', id);
   }
+
+  Future<RestaurantModel> create(Map<String, dynamic> data) async {
+    final result = await _svc.client
+        .from(SupabaseTables.restaurants)
+        .insert(data)
+        .select()
+        .single();
+    return RestaurantModel.fromMap(result);
+  }
+
+  Future<void> update(String id, Map<String, dynamic> data) async {
+    await _svc.client
+        .from(SupabaseTables.restaurants)
+        .update(data)
+        .eq('id', id);
+  }
+
+  Future<void> delete(String id) async {
+    await _svc.client
+        .from(SupabaseTables.restaurants)
+        .delete()
+        .eq('id', id);
+  }
 }

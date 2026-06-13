@@ -13,33 +13,42 @@ class CartView extends GetView<CartController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Your Cart')),
-      body: Obx(() {
-        final items = controller.items;
-        if (items.isEmpty) {
-          return const Center(child: Text('Your cart is empty'));
-        }
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: items.length,
-          separatorBuilder: (_, __) => const Divider(),
-          itemBuilder: (_, i) {
-            final c = items[i];
-            return ListTile(
-              title: Text(c.menuItem.name, style: AppTextStyles.body),
-              subtitle: Text(Formatters.currency(c.menuItem.price), style: AppTextStyles.caption),
-              trailing: Text('x${c.quantity}  ${Formatters.currency(c.subtotal)}',
-                  style: AppTextStyles.body.copyWith(color: AppColors.primary)),
-            );
-          },
-        );
-      }),
+      body: GetBuilder<CartController>(
+        builder: (_) {
+          final items = controller.items;
+          if (items.isEmpty) {
+            return const Center(child: Text('Your cart is empty'));
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: items.length,
+            separatorBuilder: (_, __) => const Divider(),
+            itemBuilder: (_, i) {
+              final c = items[i];
+              return ListTile(
+                title: Text(c.menuItem.name, style: AppTextStyles.body),
+                subtitle: Text(Formatters.currency(c.menuItem.price),
+                    style: AppTextStyles.caption),
+                trailing: Text(
+                  'x${c.quantity}  ${Formatters.currency(c.subtotal)}',
+                  style: AppTextStyles.body.copyWith(color: AppColors.primary),
+                ),
+              );
+            },
+          );
+        },
+      ),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Obx(() => ElevatedButton(
-                onPressed: () => Get.toNamed(Routes.CHECKOUT, arguments: controller),
-                child: Text('Proceed to Checkout · ${Formatters.currency(controller.total)}'),
-              )),
+          child: ElevatedButton(
+            onPressed: () => Get.toNamed(Routes.CHECKOUT, arguments: controller),
+            child: GetBuilder<CartController>(
+              builder: (_) => Text(
+                'Proceed to Checkout · ${Formatters.currency(controller.total)}',
+              ),
+            ),
+          ),
         ),
       ),
     );

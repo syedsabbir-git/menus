@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../data/repositories/auth_repo.dart';
-import '../../../../routes/app_routes.dart';
 import '../../../../core/utils/helpers.dart';
+import '../../../../core/utils/error_handler.dart';
 
 class RegisterController extends GetxController {
   final nameController = TextEditingController();
@@ -11,17 +11,21 @@ class RegisterController extends GetxController {
   final passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
-  final isLoading = false.obs;
-  final obscurePassword = true.obs;
+  bool isLoading = false;
+  bool obscurePassword = true;
 
   final _repo = AuthRepo();
 
-  void togglePasswordVisibility() => obscurePassword.toggle();
+  void togglePasswordVisibility() {
+    obscurePassword = !obscurePassword;
+    update();
+  }
 
   Future<void> register() async {
     if (!formKey.currentState!.validate()) return;
 
-    isLoading.value = true;
+    isLoading = true;
+    update();
     try {
       await _repo.signUp(
         email: emailController.text.trim(),
@@ -29,12 +33,13 @@ class RegisterController extends GetxController {
         fullName: nameController.text.trim(),
         phone: phoneController.text.trim(),
       );
-      showSnackBar(message: 'Account created! Please sign in.');
-      Get.offAllNamed(Routes.LOGIN);
+      AppSnackBar.success('Account created! Please sign in.');
+      Get.back();
     } catch (e) {
-      showSnackBar(message: e.toString(), isError: true);
+      AppSnackBar.error(ErrorHandler.parse(e));
     } finally {
-      isLoading.value = false;
+      isLoading = false;
+      update();
     }
   }
 

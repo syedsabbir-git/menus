@@ -27,44 +27,50 @@ class VendorDashboardView extends GetView<VendorDashboardController> {
           ),
         ],
       ),
-      body: Obx(() {
-        if (controller.isLoading.value) return const AppLoader();
-        final r = controller.restaurant.value;
-        if (r == null) {
-          return const Center(child: Text('No restaurant linked to your account.'));
-        }
-        return ListView(
-          padding: const EdgeInsets.all(24),
-          children: [
-            Text(r.name, style: AppTextStyles.h2),
-            if (r.description != null) ...[
-              const SizedBox(height: 8),
-              Text(r.description!, style: AppTextStyles.bodySecondary),
+      body: GetBuilder<VendorDashboardController>(
+        builder: (_) {
+          if (controller.isLoading) return const AppLoader();
+          final r = controller.restaurant;
+          if (r == null) {
+            return const Center(
+              child: Text('No restaurant linked to your account.'),
+            );
+          }
+          return ListView(
+            padding: const EdgeInsets.all(24),
+            children: [
+              Text(r.name, style: AppTextStyles.h2),
+              if (r.description != null) ...[
+                const SizedBox(height: 8),
+                Text(r.description!, style: AppTextStyles.bodySecondary),
+              ],
+              const SizedBox(height: 24),
+              SwitchListTile(
+                value: r.isOpen,
+                onChanged: controller.isToggling ? null : (_) => controller.toggleOpen(),
+                title: Text(
+                  r.isOpen ? 'Restaurant is OPEN' : 'Restaurant is CLOSED',
+                  style: AppTextStyles.h3,
+                ),
+              ),
+              const SizedBox(height: 32),
+              ListTile(
+                leading: const Icon(Icons.restaurant_menu, color: AppColors.primary),
+                title: const Text('Manage Menu'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Get.toNamed(Routes.MENU_MANAGEMENT, arguments: r),
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.receipt_long, color: AppColors.primary),
+                title: const Text('Incoming Orders'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Get.toNamed(Routes.VENDOR_ORDERS, arguments: r),
+              ),
             ],
-            const SizedBox(height: 24),
-            SwitchListTile(
-              value: r.isOpen,
-              onChanged: (_) => controller.toggleOpen(),
-              title: Text(r.isOpen ? 'Restaurant is OPEN' : 'Restaurant is CLOSED',
-                  style: AppTextStyles.h3),
-            ),
-            const SizedBox(height: 32),
-            ListTile(
-              leading: const Icon(Icons.restaurant_menu, color: AppColors.primary),
-              title: const Text('Manage Menu'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Get.toNamed(Routes.MENU_MANAGEMENT, arguments: r),
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.receipt_long, color: AppColors.primary),
-              title: const Text('Incoming Orders'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Get.toNamed(Routes.VENDOR_ORDERS, arguments: r),
-            ),
-          ],
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }

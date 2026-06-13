@@ -8,16 +8,14 @@ import '../modules/auth/login/views/login_view.dart';
 import '../modules/auth/register/bindings/register_binding.dart';
 import '../modules/auth/register/views/register_view.dart';
 
-import '../modules/customer/home/bindings/customer_home_binding.dart';
-import '../modules/customer/home/views/customer_home_view.dart';
+import '../modules/customer/shell/bindings/customer_shell_binding.dart';
+import '../modules/customer/shell/views/customer_shell_view.dart';
 import '../modules/customer/restaurant_detail/bindings/restaurant_detail_binding.dart';
 import '../modules/customer/restaurant_detail/views/restaurant_detail_view.dart';
 import '../modules/customer/cart/bindings/cart_binding.dart';
 import '../modules/customer/cart/views/cart_view.dart';
 import '../modules/customer/checkout/bindings/checkout_binding.dart';
 import '../modules/customer/checkout/views/checkout_view.dart';
-import '../modules/customer/orders/bindings/customer_orders_binding.dart';
-import '../modules/customer/orders/views/customer_orders_view.dart';
 
 import '../modules/vendor/dashboard/bindings/vendor_dashboard_binding.dart';
 import '../modules/vendor/dashboard/views/vendor_dashboard_view.dart';
@@ -41,12 +39,13 @@ class AppPages {
     GetPage(name: Routes.LOGIN, page: () => const LoginView(), binding: LoginBinding()),
     GetPage(name: Routes.REGISTER, page: () => const RegisterView(), binding: RegisterBinding()),
 
-    // Customer
+    // Customer shell (contains Home / Orders / Profile tabs)
     GetPage(
-      name: Routes.CUSTOMER_HOME,
-      page: () => const CustomerHomeView(),
-      binding: CustomerHomeBinding(),
+      name: Routes.CUSTOMER_SHELL,
+      page: () => const CustomerShellView(),
+      binding: CustomerShellBinding(),
     ),
+    // Pushed on top of the shell
     GetPage(
       name: Routes.RESTAURANT_DETAIL,
       page: () => const RestaurantDetailView(),
@@ -54,11 +53,6 @@ class AppPages {
     ),
     GetPage(name: Routes.CART, page: () => const CartView(), binding: CartBinding()),
     GetPage(name: Routes.CHECKOUT, page: () => const CheckoutView(), binding: CheckoutBinding()),
-    GetPage(
-      name: Routes.CUSTOMER_ORDERS,
-      page: () => const CustomerOrdersView(),
-      binding: CustomerOrdersBinding(),
-    ),
 
     // Vendor
     GetPage(

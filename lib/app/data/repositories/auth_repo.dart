@@ -43,4 +43,38 @@ class AuthRepo {
         .eq('id', userId)
         .maybeSingle();
   }
+
+  Future<void> updateProfile(String userId, Map<String, dynamic> data) async {
+    await _svc.client
+        .from(SupabaseTables.profiles)
+        .update(data)
+        .eq('id', userId);
+  }
+
+  // Admin-only: requires RLS policy allowing admin to SELECT all profiles
+  Future<List<Map<String, dynamic>>> fetchAllProfiles() async {
+    final data = await _svc.client
+        .from(SupabaseTables.profiles)
+        .select()
+        .order('role')
+        .order('full_name');
+    return List<Map<String, dynamic>>.from(data as List);
+  }
+
+  Future<List<Map<String, dynamic>>> fetchProfilesByRole(String role) async {
+    final data = await _svc.client
+        .from(SupabaseTables.profiles)
+        .select()
+        .eq('role', role)
+        .order('full_name');
+    return List<Map<String, dynamic>>.from(data as List);
+  }
+
+  Future<Map<String, dynamic>?> fetchProfileByEmail(String email) async {
+    return _svc.client
+        .from(SupabaseTables.profiles)
+        .select()
+        .eq('email', email)
+        .maybeSingle();
+  }
 }

@@ -30,11 +30,13 @@ class CheckoutView extends GetView<CheckoutController> {
                 validator: (v) => Validators.required(v, fieldName: 'Delivery address'),
               ),
               const SizedBox(height: 32),
-              Obx(() => PrimaryButton(
-                    label: 'Place Order',
-                    isLoading: controller.isLoading.value,
-                    onPressed: controller.placeOrder,
-                  )),
+              GetBuilder<CheckoutController>(
+                builder: (_) => PrimaryButton(
+                  label: 'Place Order',
+                  isLoading: controller.isLoading,
+                  onPressed: controller.placeOrder,
+                ),
+              ),
             ],
           ),
         ),

@@ -4,13 +4,14 @@ import '../../../../data/models/cart_item_model.dart';
 import '../../../../data/models/restaurant_model.dart';
 import '../../../../data/repositories/menu_repo.dart';
 import '../../../../core/utils/helpers.dart';
+import '../../../../core/utils/error_handler.dart';
 
 class RestaurantDetailController extends GetxController {
   late final RestaurantModel restaurant;
 
-  final menuItems = <MenuItemModel>[].obs;
-  final cart = <CartItemModel>[].obs;
-  final isLoading = true.obs;
+  List<MenuItemModel> menuItems = [];
+  List<CartItemModel> cart = [];
+  bool isLoading = true;
 
   final _repo = MenuRepo();
 
@@ -22,19 +23,20 @@ class RestaurantDetailController extends GetxController {
   }
 
   Future<void> fetchMenu() async {
-    isLoading.value = true;
+    isLoading = true;
+    update();
     try {
-      menuItems.value = await _repo.fetchTodaysMenu(restaurant.id);
+      menuItems = await _repo.fetchTodaysMenu(restaurant.id);
     } catch (e) {
-      showSnackBar(message: 'Failed to load menu.', isError: true);
+      AppSnackBar.error(ErrorHandler.parse(e));
     } finally {
-      isLoading.value = false;
+      isLoading = false;
+      update();
     }
   }
 
   int quantityOf(MenuItemModel item) {
-    final found = cart.firstWhereOrNull((c) => c.menuItem.id == item.id);
-    return found?.quantity ?? 0;
+    return cart.firstWhereOrNull((c) => c.menuItem.id == item.id)?.quantity ?? 0;
   }
 
   void addToCart(MenuItemModel item) {
@@ -43,8 +45,8 @@ class RestaurantDetailController extends GetxController {
       cart.add(CartItemModel(menuItem: item));
     } else {
       cart[index].quantity++;
-      cart.refresh();
     }
+    update();
   }
 
   void removeFromCart(MenuItemModel item) {
@@ -52,10 +54,10 @@ class RestaurantDetailController extends GetxController {
     if (index == -1) return;
     if (cart[index].quantity > 1) {
       cart[index].quantity--;
-      cart.refresh();
     } else {
       cart.removeAt(index);
     }
+    update();
   }
 
   double get cartTotal => cart.fold(0, (sum, c) => sum + c.subtotal);

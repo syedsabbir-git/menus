@@ -2,11 +2,13 @@ import 'package:get/get.dart';
 import '../../../../data/models/menu_item_model.dart';
 import '../../../../data/models/restaurant_model.dart';
 import '../../../../data/repositories/menu_repo.dart';
+import '../../../../core/utils/helpers.dart';
+import '../../../../core/utils/error_handler.dart';
 
 class MenuManagementController extends GetxController {
   late final RestaurantModel restaurant;
-  final items = <MenuItemModel>[].obs;
-  final isLoading = true.obs;
+  List<MenuItemModel> items = [];
+  bool isLoading = true;
 
   final _repo = MenuRepo();
 
@@ -18,22 +20,47 @@ class MenuManagementController extends GetxController {
   }
 
   Future<void> fetchItems() async {
-    isLoading.value = true;
+    isLoading = true;
+    update();
     try {
-      items.value = await _repo.fetchAllByRestaurant(restaurant.id);
-    } catch (_) {
+      items = await _repo.fetchAllByRestaurant(restaurant.id);
+    } catch (e) {
+      AppSnackBar.error(ErrorHandler.parse(e));
     } finally {
-      isLoading.value = false;
+      isLoading = false;
+      update();
+    }
+  }
+
+  Future<bool> saveItem(Map<String, dynamic> data) async {
+    try {
+      await _repo.upsertItem(data);
+      await fetchItems();
+      AppSnackBar.success(data.containsKey('id') ? 'Item updated.' : 'Item added.');
+      return true;
+    } catch (e) {
+      AppSnackBar.error(ErrorHandler.parse(e));
+      return false;
     }
   }
 
   Future<void> toggleAvailability(MenuItemModel item) async {
-    await _repo.toggleAvailability(item.id, !item.isAvailableToday);
-    fetchItems();
+    try {
+      await _repo.toggleAvailability(item.id, !item.isAvailableToday);
+      fetchItems();
+    } catch (e) {
+      AppSnackBar.error(ErrorHandler.parse(e));
+    }
   }
 
   Future<void> deleteItem(String id) async {
-    await _repo.deleteItem(id);
-    items.removeWhere((i) => i.id == id);
+    try {
+      await _repo.deleteItem(id);
+      items.removeWhere((i) => i.id == id);
+      update();
+      AppSnackBar.success('Item removed.');
+    } catch (e) {
+      AppSnackBar.error(ErrorHandler.parse(e));
+    }
   }
 }

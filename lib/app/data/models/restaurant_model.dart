@@ -1,6 +1,6 @@
 class RestaurantModel {
   final String id;
-  final String ownerId;
+  final String? ownerId; // null = no vendor assigned yet
   final String name;
   final String? description;
   final String? imageUrl;
@@ -9,7 +9,7 @@ class RestaurantModel {
 
   RestaurantModel({
     required this.id,
-    required this.ownerId,
+    this.ownerId,
     required this.name,
     this.description,
     this.imageUrl,
@@ -20,7 +20,7 @@ class RestaurantModel {
   factory RestaurantModel.fromMap(Map<String, dynamic> map) {
     return RestaurantModel(
       id: map['id'] as String,
-      ownerId: map['owner_id'] as String,
+      ownerId: map['owner_id'] as String?,
       name: map['name'] as String,
       description: map['description'] as String?,
       imageUrl: map['image_url'] as String?,

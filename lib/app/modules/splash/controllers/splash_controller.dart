@@ -31,9 +31,10 @@ class SplashController extends GetxController {
         case 'admin':
           Get.offAllNamed(Routes.ADMIN_DASHBOARD);
         default:
-          Get.offAllNamed(Routes.CUSTOMER_HOME);
+          Get.offAllNamed(Routes.CUSTOMER_SHELL);
       }
     } catch (_) {
+      // Any profile fetch failure → back to login for re-auth
       Get.offAllNamed(Routes.LOGIN);
     }
   }

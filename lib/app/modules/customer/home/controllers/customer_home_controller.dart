@@ -1,11 +1,13 @@
 import 'package:get/get.dart';
 import '../../../../data/models/restaurant_model.dart';
 import '../../../../data/repositories/restaurant_repo.dart';
+import '../../../../core/utils/error_handler.dart';
+import '../../../../core/utils/helpers.dart';
 
 class CustomerHomeController extends GetxController {
-  final restaurants = <RestaurantModel>[].obs;
-  final isLoading = true.obs;
-  final error = ''.obs;
+  List<RestaurantModel> restaurants = [];
+  bool isLoading = true;
+  String errorMessage = '';
 
   final _repo = RestaurantRepo();
 
@@ -16,14 +18,17 @@ class CustomerHomeController extends GetxController {
   }
 
   Future<void> fetchRestaurants() async {
-    isLoading.value = true;
-    error.value = '';
+    isLoading = true;
+    errorMessage = '';
+    update();
     try {
-      restaurants.value = await _repo.fetchAll();
+      restaurants = await _repo.fetchAll();
     } catch (e) {
-      error.value = e.toString();
+      errorMessage = ErrorHandler.parse(e);
+      AppSnackBar.error(errorMessage);
     } finally {
-      isLoading.value = false;
+      isLoading = false;
+      update();
     }
   }
 }

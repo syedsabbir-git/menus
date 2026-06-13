@@ -4,6 +4,7 @@ abstract class Routes {
   static const REGISTER = '/register';
 
   // Customer
+  static const CUSTOMER_SHELL = '/customer';
   static const CUSTOMER_HOME = '/customer/home';
   static const RESTAURANT_DETAIL = '/customer/restaurant';
   static const CART = '/customer/cart';

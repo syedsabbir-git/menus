@@ -2,10 +2,12 @@ import 'package:get/get.dart';
 import '../../../../data/models/order_model.dart';
 import '../../../../data/repositories/order_repo.dart';
 import '../../../../data/services/storage_service.dart';
+import '../../../../core/utils/helpers.dart';
+import '../../../../core/utils/error_handler.dart';
 
 class CustomerOrdersController extends GetxController {
-  final orders = <OrderModel>[].obs;
-  final isLoading = true.obs;
+  List<OrderModel> orders = [];
+  bool isLoading = true;
 
   final _repo = OrderRepo();
 
@@ -16,13 +18,16 @@ class CustomerOrdersController extends GetxController {
   }
 
   Future<void> fetchOrders() async {
-    isLoading.value = true;
+    isLoading = true;
+    update();
     try {
       final userId = StorageService.to.userId!;
-      orders.value = await _repo.fetchCustomerOrders(userId);
-    } catch (_) {
+      orders = await _repo.fetchCustomerOrders(userId);
+    } catch (e) {
+      AppSnackBar.error(ErrorHandler.parse(e));
     } finally {
-      isLoading.value = false;
+      isLoading = false;
+      update();
     }
   }
 }

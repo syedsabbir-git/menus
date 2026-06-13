@@ -3,11 +3,13 @@ import '../../../../data/models/order_model.dart';
 import '../../../../data/models/restaurant_model.dart';
 import '../../../../data/repositories/order_repo.dart';
 import '../../../../core/enums/order_status.dart';
+import '../../../../core/utils/helpers.dart';
+import '../../../../core/utils/error_handler.dart';
 
 class VendorOrdersController extends GetxController {
   late final RestaurantModel restaurant;
-  final orders = <OrderModel>[].obs;
-  final isLoading = true.obs;
+  List<OrderModel> orders = [];
+  bool isLoading = true;
 
   final _repo = OrderRepo();
 
@@ -19,17 +21,25 @@ class VendorOrdersController extends GetxController {
   }
 
   Future<void> fetchOrders() async {
-    isLoading.value = true;
+    isLoading = true;
+    update();
     try {
-      orders.value = await _repo.fetchRestaurantOrders(restaurant.id);
-    } catch (_) {
+      orders = await _repo.fetchRestaurantOrders(restaurant.id);
+    } catch (e) {
+      AppSnackBar.error(ErrorHandler.parse(e));
     } finally {
-      isLoading.value = false;
+      isLoading = false;
+      update();
     }
   }
 
   Future<void> updateStatus(String orderId, OrderStatus status) async {
-    await _repo.updateStatus(orderId, status.value);
-    fetchOrders();
+    try {
+      await _repo.updateStatus(orderId, status.value);
+      fetchOrders();
+      AppSnackBar.success('Order status updated to "${status.label}".');
+    } catch (e) {
+      AppSnackBar.error(ErrorHandler.parse(e));
+    }
   }
 }

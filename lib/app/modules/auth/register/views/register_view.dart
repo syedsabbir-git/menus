@@ -49,25 +49,29 @@ class RegisterView extends GetView<RegisterController> {
                   validator: Validators.email,
                 ),
                 const SizedBox(height: 16),
-                Obx(() => AppTextField(
-                      hint: '••••••••',
-                      label: 'Password',
-                      controller: controller.passwordController,
-                      obscureText: controller.obscurePassword.value,
-                      validator: Validators.password,
-                      suffixIcon: IconButton(
-                        icon: Icon(controller.obscurePassword.value
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined),
-                        onPressed: controller.togglePasswordVisibility,
-                      ),
-                    )),
+                GetBuilder<RegisterController>(
+                  builder: (_) => AppTextField(
+                    hint: '••••••••',
+                    label: 'Password',
+                    controller: controller.passwordController,
+                    obscureText: controller.obscurePassword,
+                    validator: Validators.password,
+                    suffixIcon: IconButton(
+                      icon: Icon(controller.obscurePassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined),
+                      onPressed: controller.togglePasswordVisibility,
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 32),
-                Obx(() => PrimaryButton(
-                      label: 'Create Account',
-                      isLoading: controller.isLoading.value,
-                      onPressed: controller.register,
-                    )),
+                GetBuilder<RegisterController>(
+                  builder: (_) => PrimaryButton(
+                    label: 'Create Account',
+                    isLoading: controller.isLoading,
+                    onPressed: controller.register,
+                  ),
+                ),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
