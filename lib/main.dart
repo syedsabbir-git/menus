@@ -23,6 +23,9 @@ Future<void> main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
+  // Register ThemeController before runApp so themeMode is available during build.
+  Get.put(ThemeController(), permanent: true);
+
   runApp(const MenusApp());
 }
 
