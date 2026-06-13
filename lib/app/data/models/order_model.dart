@@ -1,4 +1,5 @@
 import '../../core/enums/order_status.dart';
+import 'order_item_model.dart';
 
 class OrderModel {
   final String id;
@@ -8,6 +9,11 @@ class OrderModel {
   final double total;
   final String deliveryAddress;
   final DateTime createdAt;
+  // Denormalized at order-creation time — no profile join needed
+  final String? customerName;
+  final String? customerPhone;
+  final String? rejectionReason;
+  final List<OrderItemModel> items;
 
   OrderModel({
     required this.id,
@@ -17,6 +23,10 @@ class OrderModel {
     required this.total,
     required this.deliveryAddress,
     required this.createdAt,
+    this.customerName,
+    this.customerPhone,
+    this.rejectionReason,
+    this.items = const [],
   });
 
   factory OrderModel.fromMap(Map<String, dynamic> map) {
@@ -28,6 +38,46 @@ class OrderModel {
       total: (map['total'] as num).toDouble(),
       deliveryAddress: map['delivery_address'] as String? ?? '',
       createdAt: DateTime.parse(map['created_at'] as String),
+      customerName: map['customer_name'] as String?,
+      customerPhone: map['customer_phone'] as String?,
+      rejectionReason: map['rejection_reason'] as String?,
+    );
+  }
+
+  /// Returns a copy with items attached (items come from a separate batch query).
+  OrderModel withItems(List<OrderItemModel> items) {
+    return OrderModel(
+      id: id,
+      customerId: customerId,
+      restaurantId: restaurantId,
+      status: status,
+      total: total,
+      deliveryAddress: deliveryAddress,
+      createdAt: createdAt,
+      customerName: customerName,
+      customerPhone: customerPhone,
+      rejectionReason: rejectionReason,
+      items: items,
+    );
+  }
+
+  OrderModel copyWith({
+    OrderStatus? status,
+    String? rejectionReason,
+    List<OrderItemModel>? items,
+  }) {
+    return OrderModel(
+      id: id,
+      customerId: customerId,
+      restaurantId: restaurantId,
+      status: status ?? this.status,
+      total: total,
+      deliveryAddress: deliveryAddress,
+      createdAt: createdAt,
+      customerName: customerName,
+      customerPhone: customerPhone,
+      rejectionReason: rejectionReason ?? this.rejectionReason,
+      items: items ?? this.items,
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../data/repositories/order_repo.dart';
+import '../../../../data/repositories/auth_repo.dart';
 import '../../../../data/services/storage_service.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/utils/error_handler.dart';
@@ -15,11 +16,28 @@ class CheckoutController extends GetxController {
 
   late final CartController _cartCtrl;
   final _orderRepo = OrderRepo();
+  final _authRepo = AuthRepo();
+
+  String? _customerName;
+  String? _customerPhone;
 
   @override
   void onInit() {
     super.onInit();
     _cartCtrl = Get.arguments as CartController;
+    _fetchCustomerProfile();
+  }
+
+  // Fetch in the background while the user fills the address field
+  Future<void> _fetchCustomerProfile() async {
+    try {
+      final userId = StorageService.to.userId!;
+      final profile = await _authRepo.fetchProfile(userId);
+      _customerName = profile?['full_name'] as String?;
+      _customerPhone = profile?['phone'] as String?;
+    } catch (_) {
+      // Non-critical: order will be placed without denormalized customer info
+    }
   }
 
   Future<void> placeOrder() async {
@@ -43,6 +61,8 @@ class CheckoutController extends GetxController {
         total: _cartCtrl.total,
         deliveryAddress: addressController.text.trim(),
         items: orderItems,
+        customerName: _customerName,
+        customerPhone: _customerPhone,
       );
 
       AppSnackBar.success('Order placed! We\'ll notify you when it\'s confirmed.');
