@@ -5,7 +5,7 @@ import '../../../../data/services/storage_service.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/utils/error_handler.dart';
 import '../../../../routes/app_routes.dart';
-import '../../../customer/restaurant_detail/controllers/restaurant_detail_controller.dart';
+import '../../../customer/cart/controllers/cart_controller.dart';
 
 class CheckoutController extends GetxController {
   final addressController = TextEditingController();
@@ -13,13 +13,13 @@ class CheckoutController extends GetxController {
 
   bool isLoading = false;
 
-  late final RestaurantDetailController _detailCtrl;
+  late final CartController _cartCtrl;
   final _orderRepo = OrderRepo();
 
   @override
   void onInit() {
     super.onInit();
-    _detailCtrl = Get.arguments as RestaurantDetailController;
+    _cartCtrl = Get.arguments as CartController;
   }
 
   Future<void> placeOrder() async {
@@ -28,8 +28,8 @@ class CheckoutController extends GetxController {
     update();
     try {
       final userId = StorageService.to.userId!;
-      final restaurantId = _detailCtrl.cart.first.menuItem.restaurantId;
-      final orderItems = _detailCtrl.cart
+      final restaurantId = _cartCtrl.items.first.menuItem.restaurantId;
+      final orderItems = _cartCtrl.items
           .map((c) => {
                 'menu_item_id': c.menuItem.id,
                 'quantity': c.quantity,
@@ -40,7 +40,7 @@ class CheckoutController extends GetxController {
       await _orderRepo.placeOrder(
         customerId: userId,
         restaurantId: restaurantId,
-        total: _detailCtrl.cartTotal,
+        total: _cartCtrl.total,
         deliveryAddress: addressController.text.trim(),
         items: orderItems,
       );

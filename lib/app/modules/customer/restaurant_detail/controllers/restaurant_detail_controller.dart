@@ -18,7 +18,10 @@ class RestaurantDetailController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    restaurant = Get.arguments as RestaurantModel;
+    final args = Get.arguments;
+    restaurant = args is Map
+        ? args['restaurant'] as RestaurantModel
+        : args as RestaurantModel;
     fetchMenu();
   }
 
