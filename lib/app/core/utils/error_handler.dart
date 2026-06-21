@@ -55,6 +55,8 @@ class ErrorHandler {
       case 'PGRST116':
         return 'Record not found.';
       default:
+        // ignore: avoid_print
+        print('[DB ERROR] code=${e.code} message=${e.message} details=${e.details} hint=${e.hint}');
         return 'Database error. Please try again.';
     }
   }

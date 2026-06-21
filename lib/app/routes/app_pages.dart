@@ -23,6 +23,8 @@ import '../modules/vendor/menu_management/bindings/menu_management_binding.dart'
 import '../modules/vendor/menu_management/views/menu_management_view.dart';
 import '../modules/vendor/orders/bindings/vendor_orders_binding.dart';
 import '../modules/vendor/orders/views/vendor_orders_view.dart';
+import '../modules/vendor/post_menu/bindings/post_menu_binding.dart';
+import '../modules/vendor/post_menu/views/post_menu_view.dart';
 
 import '../modules/admin/dashboard/bindings/admin_dashboard_binding.dart';
 import '../modules/admin/dashboard/views/admin_dashboard_view.dart';
@@ -87,6 +89,12 @@ class AppPages {
       name: Routes.VENDOR_ORDERS,
       page: () => const VendorOrdersView(),
       binding: VendorOrdersBinding(),
+      middlewares: _vendor,
+    ),
+    GetPage(
+      name: Routes.POST_MENU,
+      page: () => const PostMenuView(),
+      binding: PostMenuBinding(),
       middlewares: _vendor,
     ),
 

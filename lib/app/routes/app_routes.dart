@@ -17,6 +17,10 @@ abstract class Routes {
   static const MENU_MANAGEMENT = '/vendor/menu';
   static const VENDOR_ORDERS = '/vendor/orders';
   static const VENDOR_PROFILE = '/vendor/profile';
+  static const POST_MENU = '/vendor/post-menu';
+
+  // Customer
+  static const MENU_POST_DETAIL = '/customer/menu-post';
 
   // Admin
   static const ADMIN_DASHBOARD = '/admin/dashboard';

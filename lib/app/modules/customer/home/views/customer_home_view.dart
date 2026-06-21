@@ -5,6 +5,7 @@ import '../../../../core/widgets/app_loader.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_dimensions.dart';
+import '../../../../data/models/daily_menu_post_model.dart';
 import '../../../../data/models/restaurant_model.dart';
 import '../../../../routes/app_routes.dart';
 
@@ -25,6 +26,8 @@ class CustomerHomeView extends GetView<CustomerHomeController> {
                 SliverToBoxAdapter(child: _Header(topPad: topPad)),
                 const SliverToBoxAdapter(child: _SearchBar()),
                 const SliverToBoxAdapter(child: _CategoryRow()),
+                if (controller.todaysPosts.isNotEmpty)
+                  _TodaysMenuSection(posts: controller.todaysPosts),
                 _RestaurantSectionHeader(
                   count: controller.restaurants.length,
                   isLoading: controller.isLoading,
@@ -446,6 +449,177 @@ class _EmptyRestaurants extends StatelessWidget {
           const SizedBox(height: 8),
           Text('Check back soon!', style: AppTextStyles.bodySecondary),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Today's Menu Section ──────────────────────────────────────────────────
+class _TodaysMenuSection extends StatelessWidget {
+  const _TodaysMenuSection({required this.posts});
+  final List<DailyMenuPost> posts;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+                AppDimensions.md, AppDimensions.md, AppDimensions.md, AppDimensions.sm),
+            child: Row(
+              children: [
+                Text("Today's Menu", style: AppTextStyles.h3),
+                const SizedBox(width: AppDimensions.sm),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+                  ),
+                  child: Text(
+                    '${posts.length} posted',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 170,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.md),
+              itemCount: posts.length,
+              separatorBuilder: (_, __) => const SizedBox(width: AppDimensions.sm),
+              itemBuilder: (_, i) => _MenuPostCard(post: posts[i]),
+            ),
+          ),
+          const SizedBox(height: AppDimensions.sm),
+        ],
+      ),
+    );
+  }
+}
+
+class _MenuPostCard extends StatelessWidget {
+  const _MenuPostCard({required this.post});
+  final DailyMenuPost post;
+
+  static const _mealColors = {
+    MealType.breakfast: Color(0xFFFF9800),
+    MealType.lunch: Color(0xFF2EC4B6),
+    MealType.dinner: Color(0xFF7C3AED),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _mealColors[post.mealType] ?? AppColors.primary;
+    final itemNames = post.items.map((i) => i.name).join(' · ');
+
+    return GestureDetector(
+      onTap: () => Get.toNamed(
+        Routes.RESTAURANT_DETAIL,
+        arguments: {'restaurantId': post.restaurantId},
+      ),
+      child: Container(
+        width: 240,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [color, color.withValues(alpha: 0.75)],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.25),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Decorative circle
+            Positioned(
+              right: -20,
+              top: -20,
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.08),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(AppDimensions.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(post.mealType.emoji,
+                          style: const TextStyle(fontSize: 20)),
+                      const SizedBox(width: AppDimensions.sm),
+                      Text(
+                        post.mealType.label,
+                        style: AppTextStyles.body.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    post.restaurantName ?? 'Restaurant',
+                    style: AppTextStyles.caption.copyWith(
+                      color: Colors.white.withValues(alpha: 0.85),
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const Spacer(),
+                  if (itemNames.isNotEmpty)
+                    Text(
+                      itemNames,
+                      style: AppTextStyles.caption.copyWith(
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  if (post.deliveryWindow != null) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.access_time,
+                            size: 12,
+                            color: Colors.white.withValues(alpha: 0.8)),
+                        const SizedBox(width: 4),
+                        Text(
+                          post.deliveryWindow!,
+                          style: AppTextStyles.caption.copyWith(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

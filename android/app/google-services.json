@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "751231410975",
+    "firebase_url": "https://pdff-f38bd-default-rtdb.firebaseio.com",
+    "project_id": "pdff-f38bd",
+    "storage_bucket": "pdff-f38bd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:751231410975:android:0018c0da584ff0d87cc62a",
+        "android_client_info": {
+          "package_name": "com.example.menus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKSw8X8VJIQ1qXmrDyP8SZOUU1SRmj4bw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

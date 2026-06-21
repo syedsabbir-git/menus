@@ -75,6 +75,13 @@ class VendorDashboardView extends GetView<VendorDashboardController> {
                     ),
                   ],
                 ),
+                const SizedBox(height: AppDimensions.sm),
+                _ActionCard(
+                  icon: Icons.campaign_outlined,
+                  label: 'Post Today\'s Menu',
+                  onTap: () => Get.toNamed(Routes.POST_MENU, arguments: r),
+                  wide: true,
+                ),
               ],
             ),
           );
@@ -246,46 +253,78 @@ class _ActionCard extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onTap,
+    this.wide = false,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final bool wide;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Material(
-      color: theme.colorScheme.surface,
+      color: wide
+          ? AppColors.primary.withValues(alpha: 0.08)
+          : theme.colorScheme.surface,
       borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-      elevation: AppDimensions.cardElevation,
+      elevation: wide ? 0 : AppDimensions.cardElevation,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: AppDimensions.lg,
-            horizontal: AppDimensions.md,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppDimensions.md),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+        child: Container(
+          decoration: wide
+              ? BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.3),
+                  ),
+                )
+              : null,
+          padding: wide
+              ? const EdgeInsets.symmetric(
+                  vertical: AppDimensions.md,
+                  horizontal: AppDimensions.lg,
+                )
+              : const EdgeInsets.symmetric(
+                  vertical: AppDimensions.lg,
+                  horizontal: AppDimensions.md,
                 ),
-                child: Icon(icon, color: AppColors.primary, size: AppDimensions.iconLg),
-              ),
-              const SizedBox(height: AppDimensions.sm),
-              Text(
-                label,
-                style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+          child: wide
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(icon, color: AppColors.primary, size: AppDimensions.iconMd),
+                    const SizedBox(width: AppDimensions.sm),
+                    Text(
+                      label,
+                      style: AppTextStyles.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(AppDimensions.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                      ),
+                      child: Icon(icon, color: AppColors.primary, size: AppDimensions.iconLg),
+                    ),
+                    const SizedBox(height: AppDimensions.sm),
+                    Text(
+                      label,
+                      style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
         ),
       ),
     );
